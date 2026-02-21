@@ -1,7 +1,15 @@
+# dependencies
 node_modules/
-.env
-.env.local 
+
+# next build
+.next/
+
+# backend build
 dist/
-build/
-coverage/
+
+# env files
+.env
+.env.local
+
+# logs
 npm-debug.log*
