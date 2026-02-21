@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 
 export const createService = async (req: Request, res: Response) => {
   try {
-    const { title, description, category, price } = req.body;
+    const { title, description, category, price, location } = req.body;
     const user = (req as any).user?.userId;
-    const service = new Service({ title, description, category, price, user });
+    const service = new Service({ title, description, category, price, location, user });
     await service.save();
     res.status(201).json(service);
   } catch (err) {

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
 import { Navigation } from '@/components/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,13 +25,15 @@ import { mockServices, mockApplications, mockNotifications, mockUsers } from '@/
 import { ClientToaster } from '@/components/client-toaster'
 
 export default function DashboardPage() {
-  const currentUser = mockUsers[0] // Mock current user
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('services')
 
-  // Filter data for current user
-  const userPostedServices = mockServices.filter(service => service.clientId === currentUser.id)
-  const userApplications = mockApplications.filter(app => app.providerId === currentUser.id)
-  const userNotifications = mockNotifications.filter(notif => notif.userId === currentUser.id)
+
+
+  // Filter data for current user (still using mock for services/apps/notifications)
+  const userPostedServices = mockServices.filter(service => service.clientId === '1')
+  const userApplications = mockApplications.filter(app => app.providerId === '1')
+  const userNotifications = mockNotifications.filter(notif => notif.userId === '1')
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -63,7 +66,9 @@ export default function DashboardPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Welcome back, {currentUser.name}</h1>
+          <h1 className="text-3xl font-bold">
+            Welcome back, {user?.username ?? '...'}
+          </h1>
           <p className="text-muted-foreground">Manage your services and applications</p>
         </div>
 

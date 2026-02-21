@@ -21,19 +21,40 @@ export default function PostServicePage() {
     location: ''
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
 
-    if (!formData.title || !formData.description || !formData.category || !formData.price || !formData.location) {
-      alert('Please fill in all fields')
-      return
-    }
-
-    // Mock service creation
-    console.log('Service posted:', formData)
-    alert('Service posted successfully!')
-    window.location.href = '/dashboard'
+  if (!formData.title || !formData.description || !formData.category || !formData.price || !formData.location) {
+    alert('Please fill in all fields')
+    return
   }
+
+  try {
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ...formData,
+        price: Number(formData.price)
+      })
+    })
+
+    const data = await res.json()
+
+    if (res.ok) {
+      alert('Service posted successfully!')
+      window.location.href = '/dashboard'
+    } else {
+      alert(data.message || 'Failed to post service')
+    }
+  } catch (err) {
+    alert('Server error')
+  }
+}
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({

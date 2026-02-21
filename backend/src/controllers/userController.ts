@@ -1,6 +1,16 @@
 import User from '../models/User';
 import { Request, Response } from 'express';
 
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById((req as any).userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await User.find().select('-password');
@@ -12,7 +22,7 @@ export const getUsers = async (_req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById((req as any).user.userId).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {

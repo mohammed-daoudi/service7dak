@@ -1,4 +1,3 @@
-
 'use client'
 import React from 'react'
 
@@ -16,35 +15,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { mockUsers, mockNotifications } from '@/lib/mock-data'
+import { mockNotifications } from '@/lib/mock-data'
+import { useAuth } from '@/context/AuthContext'
 
 export function Navigation() {
   const pathname = usePathname()
-  const [currentUser, setCurrentUser] = React.useState(null)
-  const unreadCount = mockNotifications.filter(n => currentUser && !n.isRead && n.userId === currentUser.id).length
-
-  React.useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      // Fetch user profile from backend
-      fetch('http://localhost:5000/api/users/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.user) setCurrentUser(data.user)
-        })
-        .catch(() => setCurrentUser(null))
-    } else {
-      setCurrentUser(null)
-    }
-  }, [])
+  const { user: currentUser, logout } = useAuth()
+  const unreadCount = mockNotifications.filter(n => currentUser && !n.isRead && n.userId === currentUser._id).length
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    setCurrentUser(null)
+    logout()
     window.location.href = '/login'
   }
 
@@ -106,8 +86,10 @@ export function Navigation() {
                   <Avatar className="h-8 w-8">
                     {currentUser ? (
                       <>
-                        <AvatarImage src={currentUser.avatar || ''} alt={currentUser.name || ''} />
-                        <AvatarFallback>{currentUser.name ? currentUser.name.split(' ').map(n => n[0]).join('') : ''}</AvatarFallback>
+                        <AvatarImage src={''} alt={currentUser.username || ''} />
+                        <AvatarFallback>
+                          {currentUser.username ? currentUser.username[0].toUpperCase() : '?'}
+                        </AvatarFallback>
                       </>
                     ) : (
                       <AvatarFallback>?</AvatarFallback>
@@ -119,10 +101,10 @@ export function Navigation() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {currentUser ? currentUser.name : ''}
+                      {currentUser?.username ?? ''}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {currentUser ? currentUser.email : ''}
+                      {currentUser?.email ?? ''}
                     </p>
                   </div>
                 </DropdownMenuLabel>

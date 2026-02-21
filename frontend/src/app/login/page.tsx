@@ -1,5 +1,5 @@
 'use client'
-
+import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Eye, EyeOff, Briefcase } from 'lucide-react'
@@ -10,33 +10,21 @@ import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-      const data = await res.json()
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token)
-        // Optionally store user info if returned
-        window.location.href = '/dashboard'
-      } else {
-        alert(data.message || 'Login failed')
-      }
-    } catch (err) {
-      alert('Server error')
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  try {
+    await login(formData.email, formData.password)
+    window.location.href = '/dashboard'
+  } catch (err: any) {
+    alert(err.message || 'Login failed')
   }
+}
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({

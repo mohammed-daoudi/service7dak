@@ -1,5 +1,5 @@
 'use client'
-
+import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -31,7 +31,7 @@ import {
   PenTool,
   Camera
 } from 'lucide-react'
-import { mockServices, mockUsers, mockCategories } from '@/lib/mock-data'
+import { mockUsers } from '@/lib/mock-data'
 import { SERVICE_CATEGORIES, Service } from '@/lib/types'
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -90,6 +90,17 @@ export default function CategoryPage() {
   const [locationFilter, setLocationFilter] = useState('')
   const [priceRange, setPriceRange] = useState('')
   const [sortBy, setSortBy] = useState('newest')
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services`)
+    .then(res => res.json())
+    .then(data => {
+      setServices(data)
+      setLoading(false)
+    })
+    .catch(() => setLoading(false))
+}, [])
   const [specificFilters, setSpecificFilters] = useState<Record<string, string>>({})
 
   // Check if category exists
@@ -109,11 +120,11 @@ export default function CategoryPage() {
     )
   }
 
-  const categoryData = mockCategories.find(c => c.name === categoryName)
+  const categoryData = { description: '' }
   const CategoryIcon = categoryIcons[categoryName] || Star
 
   // Filter services for this category
-  const categoryServices = mockServices.filter(service => {
+  const categoryServices = services.filter(service => {
     const matchesCategory = service.category === categoryName
     const matchesSearch = service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase())
